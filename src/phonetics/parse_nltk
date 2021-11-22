@@ -1,0 +1,42 @@
+import spacy
+from spacy.language import Language 
+from spacy.tokenizer import Tokenizer
+from spacy.lang.en import English
+
+from phonetics.apple_phonemes import get_synth, synth_parse
+
+# from AppKit import NSSpeechSynthesizer
+
+
+@Language.component('mark_sentence_boundaries')
+def mark_sentence_boundaries(doc):
+    for i, token in enumerate(doc[:-2]):
+        if token.text == '\n' and token.text[-1] == '\n':
+            doc[i+1].sent_start = True
+    return doc
+
+
+nlp = English()
+nlp.add_pipe('sentencizer')
+nlp.add_pipe('sentencizer', config={"punct_chars": ["\n"]})
+
+nnl = English()
+nnl = spacy.load("en_core_web_sm")
+
+nnl.add_pipe('mark_sentence_boundaries', before='parser')
+
+tokenizer = Tokenizer(nlp.vocab)
+
+text = ''
+
+doc = nlp(text)
+doc.sents
+
+
+synth = get_synth()
+
+# Add a rule that paragraph breaks are definitely sentence breaks ...
+
+for sent in doc.sents:
+    parse = synth_parse(sent, synth)
+    pass
